@@ -8,19 +8,19 @@ def unify_data():
         with open('data-raw/arbres_paris.json', 'r', encoding='utf-8') as f:
             paris_data = json.load(f)
             for item in paris_data:
-                fields = item 
-                
+                genre = item.get("genre", "")
+                espece = item.get("espece", "")
+                nom_latin = f"{genre} {espece}".strip()
+
                 tree = {
                     "source": "Paris",
-                    "id_externe": fields.get("idbase"),
-                    "nom_commun": fields.get("libelle_francais"),
-                    "genre": fields.get("genre"),
-                    "espece": fields.get("espece"),
-                    "circonference_cm": fields.get("circonference_cm"),
-                    "hauteur_m": fields.get("hauteur_m"),
-                    "stade_developpement": fields.get("stade_developpement"),
-                    "adresse": f"{fields.get('adresse', '')} {fields.get('arrondissement', '')}".strip(),
-                    "geo": fields.get("geo_point_2d")
+                    "commune": "Paris",
+                    "code_insee": "75000", 
+                    "nom": item.get("libelle_francais"),
+                    "latin": nom_latin if nom_latin else None,
+                    "hauteur": item.get("hauteur_m"),
+                    "circonference": item.get("circonference_cm"),
+                    "location": item.get("geo_point_2d")
                 }
                 unified_arbres.append(tree)
 
@@ -30,15 +30,13 @@ def unify_data():
             for item in hds_data:
                 tree = {
                     "source": "Hauts-de-Seine",
-                    "id_externe": item.get("objectid"),
-                    "nom_commun": item.get("nom_commun"),
-                    "genre": item.get("genre"),
-                    "espece": item.get("espece"),
-                    "circonference_cm": item.get("circonference"), 
-                    "hauteur_m": item.get("hauteur"),
-                    "stade_developpement": item.get("stade_de_developpement"),
-                    "adresse": f"{item.get('nom_du_site', '')} - {item.get('ville', '')}".strip(),
-                    "geo": item.get("geo_point_2d")
+                    "commune": item.get("ville"),
+                    "code_insee": item.get("code_insee"),
+                    "nom": item.get("nom_commun"),
+                    "latin": item.get("nom_latin"), 
+                    "hauteur": item.get("hauteur"),
+                    "circonference": item.get("circonference"),
+                    "location": item.get("geo_point_2d")
                 }
                 unified_arbres.append(tree)
 
@@ -47,7 +45,7 @@ def unify_data():
     with open('data/arbres.json', 'w', encoding='utf-8') as f:
         json.dump(unified_arbres, f, indent=4, ensure_ascii=False)
     
-    print(f"{len(unified_arbres)} arbres dans data/arbres.json")
+    print(f"{len(unified_arbres)} arbres unifiés dans 'data/arbres.json'")
 
 if __name__ == "__main__":
     unify_data()
