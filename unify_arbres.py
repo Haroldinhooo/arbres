@@ -11,17 +11,21 @@ def unify_data():
             items = data.get('records', data) if isinstance(data, dict) else data
             
             for item in items:
-                f = item.get('fields', item)
+                f_data = item.get('fields', item)
                 
+                genre = f_data.get("genre", "")
+                espece = f_data.get("espece", "")
+                nom_latin = f"{genre} {espece}".strip()
+
                 tree = {
                     "source": "Paris",
                     "commune": "Paris",
                     "code_insee": "75000",
-                    "nom": f.get("libelle_francais") or f.get("genre"),
-                    "latin": f"{f.get('genre', '')} {f.get('espece', '')}".strip(),
-                    "hauteur": f.get("hauteur_m"),
-                    "circonference": f.get("circonference_cm"),
-                    "location": f.get("geo_point_2d")
+                    "nom": f_data.get("libellefrancais"),
+                    "latin": nom_latin if nom_latin else None,
+                    "hauteur": f_data.get("hauteurenm"),
+                    "circonference": f_data.get("circonferenceencm"),
+                    "location": f_data.get("geo_point_2d")
                 }
                 unified_arbres.append(tree)
 
@@ -32,21 +36,21 @@ def unify_data():
             items = data.get('records', data) if isinstance(data, dict) else data
             
             for item in items:
-                f = item.get('fields', item)
+                f_data = item.get('fields', item)
                 
-                circ = f.get("circonference")
+                circ = f_data.get("circonference")
                 if circ and circ < 20: 
                     circ = circ * 100
                 
                 tree = {
                     "source": "Hauts-de-Seine",
-                    "commune": f.get("ville"),
-                    "code_insee": f.get("code_insee"),
-                    "nom": f.get("nom_commun"),
-                    "latin": f.get("nom_latin"),
-                    "hauteur": f.get("hauteur"),
+                    "commune": f_data.get("ville") or f_data.get("commune"),
+                    "code_insee": f_data.get("code_insee"),
+                    "nom": f_data.get("nom_commun"),
+                    "latin": f_data.get("nom_latin"),
+                    "hauteur": f_data.get("hauteur"),
                     "circonference": circ,
-                    "location": f.get("geo_point_2d")
+                    "location": f_data.get("geo_point_2d")
                 }
                 unified_arbres.append(tree)
 
@@ -54,7 +58,7 @@ def unify_data():
     with open('data/arbres.json', 'w', encoding='utf-8') as f:
         json.dump(unified_arbres, f, indent=4, ensure_ascii=False)
     
-    print(f"{len(unified_arbres)} arbres.")
+    print(f"{len(unified_arbres)} arbres unifiés avec succès.")
 
 if __name__ == "__main__":
     unify_data()
